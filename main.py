@@ -5,6 +5,8 @@ import tldextract
 from googlesearch import search
 import time
 import requests
+from urllib.parse import urljoin
+
 
 
 title = ""
@@ -46,7 +48,7 @@ def getDOM(url):
       soup = BeautifulSoup(mystr, 'html.parser')
       return soup
    except:
-      print("Getting DOM for url: " + url + " failed")
+      print("Failed getting DOM for url: " + url + " failed")
 
 def CalculateJaccardSimilarity(matched_domain_DOM, query_url_DOM):
    print("need to do this function")
@@ -65,34 +67,70 @@ def get_search_results(query, num_results = 10):
 
 legit_status = False
 domain_status = False
-query_url_DOM = getDOM(url)         #this input is the URL that the user wants to visit. 
+query_url_DOM = getDOM("https://github.githubassets.com/assets/wp-runtime-f2f62e543293.js")         #this input is the URL that the user wants to visit. 
 
-if title != "Title doesnt exist":      #7
-   query = title + ' ' + domain_name   
-   results = get_search_results(query) #9
-   for r in results:                   #10
-      domain_r = get_domain_name(r)    #11
-      baseURL_r = get_base_url(r)      #12
-      if domain_r == domain_name :     #14
-         domain_status = True          #15
-         if baseURL_r ==  baseURL :    #16
-            print("Legitimate")        #17
-         matched_domain_DOM = getDOM(r)#19
+print(query_url_DOM)
+
+# tags = soup.find_all(['hr', 'strong'])
+
+css_files = []
+for css in soup.find_all("link"):
+    if css.attrs.get("href"):
+        # if the link tag has the 'href' attribute
+        css_url = urljoin(url, css.attrs.get("href"))
+        css_files.append(css_url)
+print(css_files)
+
+js_files = []
+for js in soup.find_all("script"):
+    if js.attrs.get("src"):
+        # if the link tag has the 'href' attribute
+        js_url = urljoin(url, js.attrs.get("src"))
+        js_files.append(js_url)
+print(js_files)
+
+img_files = []
+for img in soup.find_all("img"):
+    if img.attrs.get("src"):
+        # if the link tag has the 'href' attribute
+        img_url = urljoin(url, img.attrs.get("src"))
+        img_files.append(img_url)
+print(img_files)
+
+links_files = []
+for links in soup.find_all("a"):
+    if links.attrs.get("href"):
+        # if the link tag has the 'href' attribute
+        links_url = urljoin(url, links.attrs.get("href"))
+        links_files.append(links_url)
+print(links_files)
+
+# if title != "Title doesnt exist":      #7
+#    query = title + ' ' + domain_name   
+#    results = get_search_results(query) #9
+#    for r in results:                   #10
+#       domain_r = get_domain_name(r)    #11
+#       baseURL_r = get_base_url(r)      #12
+#       if domain_r == domain_name :     #14
+#          domain_status = True          #15
+#          if baseURL_r ==  baseURL :    #16
+#             print("Legitimate")        #17
+#          matched_domain_DOM = getDOM(r)#19
    
-   if domain_status == False:
-      query = domain_name              #23
-   else:
-      print("compute jaccard similarity")
-else:
-   query = domain_name                 #28
+#    if domain_status == False:
+#       query = domain_name              #23
+#    else:
+#       print("compute jaccard similarity")
+# else:
+#    query = domain_name                 #28
 
-results = get_search_results(query)    #30
-for r in results:
-   domain_r = get_domain_name(r)       #32
-   if domain_r == domain_name:         #34
-      domain_status = True             #35
-      matched_domain_DOM = getDOM(r)   #36
+# results = get_search_results(query)    #30
+# for r in results:
+#    domain_r = get_domain_name(r)       #32
+#    if domain_r == domain_name:         #34
+#       domain_status = True             #35
+#       matched_domain_DOM = getDOM(r)   #36
    
 
-if domain_status == True:              #39
-   similarity_score = CalculateJaccardSimilarity(matched_domain_DOM,query_url_DOM)
+# if domain_status == True:              #39
+#    similarity_score = CalculateJaccardSimilarity(matched_domain_DOM,query_url_DOM)
