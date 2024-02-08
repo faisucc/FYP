@@ -65,18 +65,10 @@ def get_search_results(query, num_results = 10):
 
 legit_status = False
 domain_status = False
-query_url_DOM = getDOM("https://www.nitc.ac.in/")         #this input is the URL that the user wants to visit. 
+query_url = "https://www.nitc.ac.in/"
+query_url_DOM = getDOM(query_url)         #this input is the URL that the user wants to visit. 
 
 soup = getDOM("https://www.nitc.ac.in/departments")
-# print(soup)
-# print(query_url_DOM)
-
- 
-# img_tags = soup.find_all(['img'])
-# script_tags = soup.find_all(['script'])
-# style_tags = soup.find_all(['style'])
-# a_tags = soup.find_all(['a'])
-
 
 css_files = []
 for css in soup.find_all("link"):
@@ -116,22 +108,13 @@ print("suspicoenriugvnerjogne count = ", suspicious_page_count)
 
 
 def CalculateJaccardSimilarity(matched_domain_DOM, matched_url):
-   print("need to do this function")
+#    print("need to do this function")
    common_elements_count = 0
    img_tags = matched_domain_DOM.find_all(['img'])
    script_tags = matched_domain_DOM.find_all(['script'])
    style_tags = matched_domain_DOM.find_all(['style'])
    a_tags = matched_domain_DOM.find_all(['a'])
    matched_page_count = len(img_tags) + len(script_tags) + len(style_tags) + len(a_tags) 
-
-#    img_files = []
-#     for img in soup.find_all("img"):
-#         if img.attrs.get("src"):
-#             # if the link tag has the 'href' attribute
-#             img_url = urljoin(url, img.attrs.get("src"))
-#             img_files.append(img_url)
-    # print(img_files)
-
 
    for img in img_tags:
        if img.attrs.get("src"):
@@ -157,39 +140,56 @@ def CalculateJaccardSimilarity(matched_domain_DOM, matched_url):
            if a_url in links_files:
                 common_elements_count += 1
 
-   print("common elements = ", common_elements_count)
+#    print("common elements = ", common_elements_count)
    similarity_score = common_elements_count/(suspicious_page_count + matched_page_count - common_elements_count)
    return similarity_score
  
 
-print(CalculateJaccardSimilarity(query_url_DOM, "https://www.nitc.ac.in/"))  #change 2nd variable to each matched result URL
+# print(CalculateJaccardSimilarity(query_url_DOM, query_url))  #change 2nd variable to each matched result URL
 
-# if title != "Title doesnt exist":      #7
-#    query = title + ' ' + domain_name   
-#    results = get_search_results(query) #9
-#    for r in results:                   #10
-#       domain_r = get_domain_name(r)    #11
-#       baseURL_r = get_base_url(r)      #12
-#       if domain_r == domain_name :     #14
-#          domain_status = True          #15
-#          if baseURL_r ==  baseURL :    #16
-#             print("Legitimate")        #17
-#          matched_domain_DOM = getDOM(r)#19
-   
-#    if domain_status == False:
-#       query = domain_name              #23
-#    else:
-#       print("compute jaccard similarity")
-# else:
-#    query = domain_name                 #28
+def step40():
+    threshold = 0.75
+    similarity_score = CalculateJaccardSimilarity(matched_domain_DOM,matched_domain_url)
+    if similarity_score > threshold:
+        legit_status = True
+    else:
+        legit_status = False
+    if legit_status == True:
+        print("From Jailphish similarity, LEGITIMATE")
+        exit()
+    else:
+        print("From jailphish similarity, PHISHING")
+        exit()
 
-# results = get_search_results(query)    #30
-# for r in results:
-#    domain_r = get_domain_name(r)       #32
-#    if domain_r == domain_name:         #34
-#       domain_status = True             #35
-#       matched_domain_DOM = getDOM(r)   #36
-   
+if title != "Title doesnt exist":      #7
+   query = title + ' ' + domain_name   
+   results = get_search_results(query) #9
+   for r in results:                   #10
+      domain_r = get_domain_name(r)    #11
+      baseURL_r = get_base_url(r)      #12
+      if domain_r == domain_name :     #14
+         domain_status = True          #15
+         if baseURL_r ==  baseURL :    #16
+            print("Legitimate")        #17
+            exit()
+         matched_domain_DOM = getDOM(r)#19
+         matched_domain_url = r
+   if domain_status == False:
+      query = domain_name              #23
+   else:
+      step40()
+else:
+   query = domain_name                 #28
 
-# if domain_status == True:              #39
-#    similarity_score = CalculateJaccardSimilarity(matched_domain_DOM,query_url_DOM)
+results = get_search_results(query)    #30
+for r in results:
+   domain_r = get_domain_name(r)       #32
+   if domain_r == domain_name:         #34
+      domain_status = True             #35
+      matched_domain_DOM = getDOM(r)   #36
+      matched_domain_url = r
+
+if domain_status == True:              #39
+    step40()
+else:
+    print("Domain status false - PHISHING!")
