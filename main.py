@@ -8,7 +8,7 @@ import requests
 from urllib.parse import urljoin
 import time
 
-suspicious_link = "https://multi-chains.web.app/app/"
+suspicious_link = "https://nitc.ac.in/"
 
 title = ""
 try:
@@ -19,7 +19,7 @@ try:
   soup = BeautifulSoup(mystr, 'html.parser')
   title = soup.find('title').text
 except:
-     title = ""
+     title = "Title doesnt exist"
 
 print("Title: ", title)
 
